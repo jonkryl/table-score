@@ -2,11 +2,14 @@ package com.jonkryl.tablescore.ads
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.view.Gravity
 import android.widget.FrameLayout
+import android.widget.Toast
 import com.jonkryl.tablescore.BuildConfig
+import com.jonkryl.tablescore.R
 import com.yandex.mobile.ads.banner.BannerAdEventListener
 import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.banner.BannerAdView
@@ -82,7 +85,11 @@ class BannerController(private val activity: Activity) {
             .setPositiveButton(if (russian) "Разрешить персонализацию" else "Allow personalization") { _, _ -> choose(true) }
             .setNegativeButton(if (russian) "Контекстная реклама" else "Contextual ads") { _, _ -> choose(false) }
             .setNeutralButton(if (russian) "Политика" else "Privacy policy") { _, _ ->
-                activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.PRIVACY_POLICY_URL)))
+                try {
+                    activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.PRIVACY_POLICY_URL)))
+                } catch (_: ActivityNotFoundException) {
+                    Toast.makeText(activity, R.string.no_browser, Toast.LENGTH_LONG).show()
+                }
             }.show()
     }
 
