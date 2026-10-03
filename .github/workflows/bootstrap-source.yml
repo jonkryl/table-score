@@ -55,9 +55,9 @@ jobs:
                   destination = (root / Path(*relative.parts)).resolve()
                   if destination != root and root not in destination.parents:
                       raise SystemExit(f'Path escapes checkout: {member.name}')
-              source.extractall(root, members=members, filter='data')
-          required = ['gradlew', 'gradle/wrapper/gradle-wrapper.jar', 'app/build.gradle.kts',
-                      '.github/workflows/android-ci.yml', '.github/workflows/release.yml']
+              # Workflow files are saved separately by the authorized human browser session.
+              source.extractall(root, members=[m for m in members if not m.name.startswith('.github/')], filter='data')
+          required = ['gradlew', 'gradle/wrapper/gradle-wrapper.jar', 'app/build.gradle.kts']
           if not all(Path(path).is_file() for path in required):
               raise SystemExit('Archive does not contain the complete native project')
           Path('gradlew').chmod(0o755)
@@ -65,7 +65,7 @@ jobs:
               script.chmod(0o755)
           # The permanent CI/release files retain provenance; bootstrap is only a transport.
           archive.unlink()
-          Path(os.environ['BOOTSTRAP_WORKFLOW']).unlink(missing_ok=True)
+          # Bootstrap is removed later in the browser; this token cannot edit workflows.
           PY
       - name: Commit the verified source to main
         run: |
