@@ -526,12 +526,14 @@ class MainActivity : Activity() {
     private fun fitLegacyScore(value: TextView) {
         if (Build.VERSION.SDK_INT >= 26) return
         value.post {
-            val available = value.width - value.paddingLeft - value.paddingRight
-            if (available <= 0) return@post
+            val availableWidth = value.width - value.paddingLeft - value.paddingRight
+            val availableHeight = value.height - value.paddingTop - value.paddingBottom
+            if (availableWidth <= 0 || availableHeight <= 0) return@post
             val paint = android.graphics.Paint(value.paint)
             var size = 46f
             paint.textSize = size * resources.displayMetrics.scaledDensity
-            while (size > 12f && paint.measureText(value.text.toString()) > available) {
+            while (size > 12f && (paint.measureText(value.text.toString()) > availableWidth ||
+                    paint.fontMetrics.bottom - paint.fontMetrics.top > availableHeight)) {
                 size -= 1f
                 paint.textSize = size * resources.displayMetrics.scaledDensity
             }
