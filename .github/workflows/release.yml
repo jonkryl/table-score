@@ -36,7 +36,6 @@ jobs:
       KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
       KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      KEYSTORE_FILE: ${{ runner.temp }}/table-score-upload.jks
       VERSION_CODE: ${{ inputs.version_code }}
       VERSION_NAME: ${{ inputs.version_name }}
     steps:
@@ -46,8 +45,13 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: gradle/actions/setup-gradle@48b5f213c81028ace310571dc5ec0fbbca0b2947 # v4
-      - name: Install Android 36 platform and build tools
-        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Set up Android SDK and API 36 build tools
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+          log-accepted-android-sdk-licenses: 'false'
+      - name: Set the ephemeral upload key path
+        run: printf 'KEYSTORE_FILE=%s/table-score-upload.jks\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
       - name: Load the protected upload key
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
