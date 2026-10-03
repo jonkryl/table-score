@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="new_game_button" type="id"/>
+    <item name="player_count_input" type="id"/>
+    <item name="start_game_button" type="id"/>
+    <item name="round_button" type="id"/>
+    <item name="round_label" type="id"/>
+    <item name="undo_button" type="id"/>
+    <item name="finish_game_button" type="id"/>
+    <item name="share_button" type="id"/>
+    <item name="history_button" type="id"/>
+    <item name="privacy_button" type="id"/>
+    <item name="more_button" type="id"/>
+    <item name="ad_container" type="id"/>
+    <item name="exact_points_input" type="id"/>
+    <item name="exact_apply_button" type="id"/>
+    <item name="player_name_input_0" type="id"/><item name="player_name_input_1" type="id"/>
+    <item name="player_name_input_2" type="id"/><item name="player_name_input_3" type="id"/>
+    <item name="player_name_input_4" type="id"/><item name="player_name_input_5" type="id"/>
+    <item name="player_name_input_6" type="id"/><item name="player_name_input_7" type="id"/>
+    <item name="score_plus_0" type="id"/><item name="score_plus_1" type="id"/>
+    <item name="score_plus_2" type="id"/><item name="score_plus_3" type="id"/>
+    <item name="score_plus_4" type="id"/><item name="score_plus_5" type="id"/>
+    <item name="score_plus_6" type="id"/><item name="score_plus_7" type="id"/>
+    <item name="score_minus_0" type="id"/><item name="score_minus_1" type="id"/>
+    <item name="score_minus_2" type="id"/><item name="score_minus_3" type="id"/>
+    <item name="score_minus_4" type="id"/><item name="score_minus_5" type="id"/>
+    <item name="score_minus_6" type="id"/><item name="score_minus_7" type="id"/>
+    <item name="score_exact_0" type="id"/><item name="score_exact_1" type="id"/>
+    <item name="score_exact_2" type="id"/><item name="score_exact_3" type="id"/>
+    <item name="score_exact_4" type="id"/><item name="score_exact_5" type="id"/>
+    <item name="score_exact_6" type="id"/><item name="score_exact_7" type="id"/>
+    <item name="score_value_0" type="id"/><item name="score_value_1" type="id"/>
+    <item name="score_value_2" type="id"/><item name="score_value_3" type="id"/>
+    <item name="score_value_4" type="id"/><item name="score_value_5" type="id"/>
+    <item name="score_value_6" type="id"/><item name="score_value_7" type="id"/>
+</resources>

@@ -1,0 +1,27 @@
+:root { color-scheme: light; --paper: #f7f4eb; --ink: #173d35; --muted: #50675f; --line: #d4ddd0; --mint: #d9e9cf; --coral: #ed795d; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 18px/1.65 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+a { color: var(--ink); text-underline-offset: .2em; }
+a:hover { text-decoration-thickness: .14em; }
+a:focus-visible { outline: 3px solid var(--coral); outline-offset: 5px; border-radius: 2px; }
+header, main, footer { max-width: 900px; padding: 28px; margin: auto; }
+header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; border-bottom: 1px solid var(--line); }
+header a { font-weight: 700; }
+nav { display: flex; flex-wrap: wrap; gap: 20px; font-size: 15px; }
+h1 { font-size: clamp(32px, 6vw, 52px); letter-spacing: -.04em; line-height: 1.08; margin: 16px 0 24px; }
+h2 { line-height: 1.2; margin-top: 36px; font-size: 26px; letter-spacing: -.02em; }
+h3 { font-size: 21px; margin: 24px 0 8px; }
+p, ul, ol { margin-top: 12px; margin-bottom: 20px; }
+li { margin-bottom: 8px; }
+.eyebrow { font-size: 14px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.lead { font-size: 23px; line-height: 1.5; }
+.note { border-left: 5px solid var(--coral); background: #fff9; padding: 18px 22px; border-radius: 0 12px 12px 0; }
+.note p { margin: 0; }
+.actions { display: flex; flex-wrap: wrap; gap: 14px; margin: 26px 0; }
+.button { background: var(--ink); color: #fff; border-radius: 12px; padding: 12px 18px; font-weight: 650; text-decoration: none; }
+.button.secondary { background: var(--mint); color: var(--ink); }
+.languages { border-top: 1px solid var(--line); padding-top: 34px; margin-top: 46px; scroll-margin-top: 20px; }
+.small, footer { font-size: 15px; color: var(--muted); }
+footer { border-top: 1px solid var(--line); margin-top: 28px; }
+code { font-size: .85em; overflow-wrap: anywhere; }
+@media (max-width: 560px) { header, main, footer { padding: 22px; } body { font-size: 17px; } .lead { font-size: 21px; } }
