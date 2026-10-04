@@ -160,7 +160,7 @@ class NewGameDraftRecreationTest {
             assertEquals(oldGame.rounds, historical.rounds)
             assertEquals(previous, replacement.undoState)
             onView(withId(R.id.player_count_input)).check(doesNotExist())
-            onView(withId(R.id.undo_button)).perform(scrollTo(), click())
+            onView(withId(R.id.undo_button)).perform(click())
             assertEquals("One undo restores the exact unfinished prior game", previous, ScoreRepository(context).state)
             assertFalse(requireNotNull(ScoreRepository(context).activeGame).isFinished)
         }
