@@ -42,6 +42,10 @@ class MainActivity : Activity() {
     private lateinit var content: LinearLayout
     private lateinit var scroll: ScrollView
     private lateinit var undoButton: Button
+    private var newGameDialog: AlertDialog? = null
+    private var newGameReplacementDialog: AlertDialog? = null
+    private var newGameCount: EditText? = null
+    private var newGameNames: List<EditText> = emptyList()
     private val scoreTexts = mutableMapOf<String, TextView>()
     private val roundTexts = mutableMapOf<String, TextView>()
     private val ink = Color.rgb(23, 61, 53)
@@ -90,9 +94,24 @@ class MainActivity : Activity() {
         setContentView(root)
         render()
         banner.attach(adHost)
+        savedInstanceState?.getBundle("new_game_draft")?.let { showNewGame(it) }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (newGameDialog?.isShowing == true) {
+            outState.putBundle("new_game_draft", Bundle().apply {
+                putString("count", newGameCount?.text?.toString() ?: "2")
+                putStringArrayList("names", ArrayList(newGameNames.map { it.text.toString() }))
+                putBoolean("replacement_confirmation", newGameReplacementDialog?.isShowing == true)
+            })
+        }
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
+        // These windows belong to this Activity; its saved draft contains values, never Views.
+        newGameReplacementDialog?.dismiss()
+        newGameDialog?.dismiss()
         if (::banner.isInitialized) banner.destroy()
         super.onDestroy()
     }
@@ -295,10 +314,15 @@ class MainActivity : Activity() {
         undoButton.alpha = if (repository.canUndo) 1f else 0.45f
     }
 
-    private fun showNewGame() {
+    private fun showNewGame(savedDraft: Bundle? = null) {
+        newGameReplacementDialog?.dismiss()
+        newGameDialog?.dismiss()
+        val initialCount = savedDraft?.getString("count") ?: "2"
+        val initialNames = savedDraft?.getStringArrayList("names")
+        val visibleCount = initialCount.toIntOrNull()?.coerceIn(2, 8) ?: 2
         val form = column().apply { setPadding(dp(20), dp(12), dp(20), dp(10)) }
         form.addView(text(getString(R.string.players_count), 15f, ink, true))
-        val count = input("2", R.id.player_count_input).apply {
+        val count = input(initialCount, R.id.player_count_input).apply {
             inputType = InputType.TYPE_CLASS_NUMBER
             filters = arrayOf(InputFilter.LengthFilter(1))
             setSelectAllOnFocus(true)
@@ -306,12 +330,12 @@ class MainActivity : Activity() {
         }
         form.addView(count, matchWrap())
         val names = (0 until 8).map { index ->
-            input(getString(R.string.player_default, index + 1), playerNameIds[index]).apply {
+            input(initialNames?.getOrNull(index) ?: getString(R.string.player_default, index + 1), playerNameIds[index]).apply {
                 hint = getString(R.string.player_name, index + 1)
                 contentDescription = hint
                 setSelectAllOnFocus(true)
                 filters = arrayOf(InputFilter.LengthFilter(40))
-                visibility = if (index < 2) View.VISIBLE else View.GONE
+                visibility = if (index < visibleCount) View.VISIBLE else View.GONE
             }.also { form.addView(it, matchWrap().apply { topMargin = dp(4) }) }
         }
         count.addTextChangedListener(object : TextWatcher {
@@ -326,17 +350,29 @@ class MainActivity : Activity() {
         form.addView(start, matchWrap().apply { topMargin = dp(16) })
         val dialog = AlertDialog.Builder(this).setTitle(R.string.new_game)
             .setView(ScrollView(this).apply { addView(form) }).setNegativeButton(R.string.cancel, null).create()
-        start.setOnClickListener {
+        newGameDialog = dialog
+        newGameCount = count
+        newGameNames = names
+        dialog.setOnDismissListener {
+            if (newGameDialog === dialog) {
+                newGameReplacementDialog?.dismiss()
+                newGameReplacementDialog = null
+                newGameDialog = null
+                newGameCount = null
+                newGameNames = emptyList()
+            }
+        }
+        fun prepareStart(restoringConfirmation: Boolean = false) {
             val playerCount = count.text.toString().toIntOrNull()
             if (playerCount == null || playerCount !in 2..8) {
                 count.error = getString(R.string.invalid_count)
-                return@setOnClickListener
+                return
             }
             val gameNames = names.take(playerCount).map { it.text.toString().trim() }
             val invalid = gameNames.indexOfFirst { it.isEmpty() || it.length > 40 }
             if (invalid >= 0) {
                 names[invalid].error = getString(R.string.invalid_name)
-                return@setOnClickListener
+                return
             }
             val createGame = {
                 if (mutate(resetScroll = true) {
@@ -347,10 +383,23 @@ class MainActivity : Activity() {
                 }
             }
             if (repository.activeGame?.isFinished == false) {
-                confirm(R.string.replace_title, R.string.replace_body, R.string.start_game) { createGame() }
-            } else createGame()
+                newGameReplacementDialog?.dismiss()
+                val replacement = AlertDialog.Builder(this).setTitle(R.string.replace_title)
+                    .setMessage(R.string.replace_body)
+                    .setPositiveButton(R.string.start_game) { _, _ ->
+                        if (newGameDialog === dialog && !isDestroyed) createGame()
+                    }.setNegativeButton(R.string.cancel, null).create()
+                newGameReplacementDialog = replacement
+                replacement.setOnDismissListener {
+                    if (newGameReplacementDialog === replacement) newGameReplacementDialog = null
+                }
+                replacement.show()
+            } else if (!restoringConfirmation) createGame()
         }
+        start.setOnClickListener { prepareStart() }
         dialog.show()
+        // Restore only the pending confirmation window; never commit a game during restoration.
+        if (savedDraft?.getBoolean("replacement_confirmation") == true) prepareStart(true)
     }
 
     private fun enterPoints(player: Player) {
